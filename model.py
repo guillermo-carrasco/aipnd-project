@@ -8,13 +8,12 @@ import torch
 from torch import nn, optim
 from torchvision import models
 
-log = logging.getLogger()
 
-
-def build_model(architecture, dropout=0.5, lr=0.001):
+def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
     """
     Builds a deep CNN to classify images of flowers
     :param architecture: Architecture to use for the CNN
+    :param hidden_units: Number of hidden units in the first FC layer
     :param dropout: Probability of dropout
     :param lr: Learning rate
     :return: mode, criterion, optimizer
@@ -22,7 +21,7 @@ def build_model(architecture, dropout=0.5, lr=0.001):
     arch = getattr(models, architecture)
     model = arch(pretrained=True)
 
-    log.info('Building model with architecture: {}'.format(architecture))
+    logging.info('Building model with architecture: {}'.format(architecture))
 
     # Save the model architecture for future loading
     model.architecture = architecture
@@ -33,7 +32,7 @@ def build_model(architecture, dropout=0.5, lr=0.001):
 
     classifier = nn.Sequential(OrderedDict([
         ('dropout', nn.Dropout(dropout)),
-        ('fc1', nn.Linear(1024, 120)),
+        ('fc1', nn.Linear(hidden_units, 120)),
         ('relu1', nn.ReLU()),
         ('fc2', nn.Linear(120, 90)),
         ('relu2', nn.ReLU()),
@@ -58,5 +57,6 @@ def save_model(model, class_to_idx, dest='checkpoint.pth'):
     """
     model.class_to_idx = class_to_idx
     torch.save({'state_dict': model.state_dict(),
-                'class_to_idx': model.class_to_idx},
+                'class_to_idx': model.class_to_idx,
+                'architecture': model.architecture},
                 dest)

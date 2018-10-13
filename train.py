@@ -1,6 +1,5 @@
 import argparse
 import logging
-import os
 
 import torch
 
@@ -8,7 +7,7 @@ from helpers import get_device, is_dir, bounded
 from model import build_model, save_model
 from process import get_datasets_and_loaders
 
-log = logging.getLogger()
+logging.getLogger().setLevel(logging.INFO)
 
 
 def train(epochs=15, print_every=40, save=True):
@@ -81,7 +80,7 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train a model to classify flowers')
     parser.add_argument('data_dir', type=str, help='Directory with training and test data')
-    parser.add_argument('--save-dir', type=str, help='Directory where to save the model checkpoint')
+    parser.add_argument('--save-dir', type=str, default='.', help='Directory where to save the model checkpoint')
     parser.add_argument('--arch', default='densenet121', choices=['densenet121', 'vgg16', 'densenet161'],
                         help='CNN Architecture to use for feature detection')
     parser.add_argument('--learning-rate', default=0.001, type=float, help='Learning rate to use while training')
@@ -98,8 +97,23 @@ if __name__ == '__main__':
         raise argparse.ArgumentTypeError('Save directory does not exist or is not accessible')
     bounded(args.dropout, 0, 1, float)
 
-    model = build_model(architecture=args.arch, dropout=args.dropous, lr=args.learning_rate)
-    print(model)
+    # Summarize parameters
+    params = {
+        'Data directory': args.data_dir,
+        'Save directory': args.save_dir,
+        'Architecture': args.arch,
+        'Learning rate': args.learning_rate,
+        'Hidden units': args.hidden_units,
+        'Dropout probability': args.dropout,
+        'Epochs': args.epochs,
+        'GPU': 'true' if args.gpu else 'false'
+    }
+    logging.info('Running training with following parameters: \n\n{}'.format('\n'.join(['{}: {}'.format(k, v) for k, v in params.items()])))
+
+    model, criterion, optimizer = build_model(architecture=args.arch,
+                                              hidden_units=args.hidden_units,
+                                              dropout=args.dropout,
+                                              lr=args.learning_rate)
 
     #model = train()
     #model = train()
