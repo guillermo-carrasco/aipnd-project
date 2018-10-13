@@ -27,3 +27,13 @@ def get_device(gpu=True):
     :param gpu: If available, train on GPU
     """
     return torch.device("cuda:0" if torch.cuda.is_available() and gpu else "cpu")
+
+
+def summarize_params(params):
+    """
+    Constructs a string with a summary of the CLI arguments
+    :param params: CLI arguments
+    :return: A summary of CLI arguments
+    """
+    return 'Running with following parameters: \n\n{}'.format(
+              '\n'.join(['{}: {}'.format(k, v) for k, v in params.items()]))

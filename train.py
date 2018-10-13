@@ -3,7 +3,7 @@ import logging
 
 import torch
 
-from helpers import get_device, is_dir, bounded
+from helpers import get_device, is_dir, bounded, summarize_params
 from model import build_model, save_model
 from process import get_datasets_and_loaders
 
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         'Epochs': args.epochs,
         'GPU': 'true' if args.gpu else 'false'
     }
-    logging.info('Running training with following parameters: \n\n{}'.format('\n'.join(['{}: {}'.format(k, v) for k, v in params.items()])))
+    logging.info(summarize_params(params))
 
     model, criterion, optimizer = build_model(architecture=args.arch,
                                               hidden_units=args.hidden_units,
