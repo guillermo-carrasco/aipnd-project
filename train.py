@@ -4,7 +4,7 @@ import os
 
 import torch
 
-from helpers import get_device
+from helpers import get_device, is_dir, bounded
 from model import build_model, save_model
 from process import get_datasets_and_loaders
 
@@ -74,13 +74,32 @@ def train(epochs=15, print_every=40, save=True):
     if save:
         save_model(model, image_datasets['train'].class_to_idx)
 
+    return model
+
 
 if __name__ == '__main__':
+    # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train a model to classify flowers')
-    parser.add_argument('data_dir', type=str, required=True, help='Directory with training and test data')
+    parser.add_argument('data_dir', type=str, help='Directory with training and test data')
+    parser.add_argument('--save-dir', type=str, help='Directory where to save the model checkpoint')
+    parser.add_argument('--arch', default='densenet121', choices=['densenet121', 'vgg16', 'densenet161'],
+                        help='CNN Architecture to use for feature detection')
+    parser.add_argument('--learning-rate', default=0.001, type=float, help='Learning rate to use while training')
+    parser.add_argument('--hidden-units', default=1024, type=int, help='NUmber of hidden units on the first FC layer')
+    parser.add_argument('--dropout', default=0.5, type=float, help='Probability of dropout')
+    parser.add_argument('--epochs', default=15, type=int, help='Number of epochs to run the training')
+    parser.add_argument('--gpu', action='store_true', help='Train the model on a GPU (if available)')
     args = parser.parse_args()
 
-    if not os.path.exists(args.data_dir):
-        log.error('ERROR: Data directory does not exist or is not accessible')
+    # *Minimal* error validation
+    if not is_dir(args.data_dir):
+        raise argparse.ArgumentTypeError('Data directory does not exist or is not accessible')
+    if not is_dir(args.save_dir):
+        raise argparse.ArgumentTypeError('Save directory does not exist or is not accessible')
+    bounded(args.dropout, 0, 1, float)
 
-    train()
+    model = build_model(architecture=args.arch, dropout=args.dropous, lr=args.learning_rate)
+    print(model)
+
+    #model = train()
+    #model = train()
