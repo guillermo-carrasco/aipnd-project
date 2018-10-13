@@ -28,6 +28,8 @@ def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
 
     # Save the model architecture for future loading
     model.architecture = architecture
+    model.learning_rate = lr
+    model.dropout = dropout
 
     # Freeze parameters so we don't backprop through them
     for param in model.parameters():
@@ -84,7 +86,10 @@ def save_model(model, class_to_idx, dest='.'):
     model.class_to_idx = class_to_idx
     torch.save({'state_dict': model.state_dict(),
                 'class_to_idx': model.class_to_idx,
-                'architecture': model.architecture},
+                'architecture': model.architecture,
+                'learning_rate': model.learning_rate,
+                'dropout': model.dropout,
+                'epochs': model.epochs},
                 dest)
 
 
@@ -98,5 +103,8 @@ def load_model(path):
     m, c, o = build_model(checkpoint['architecture'])
     m.class_to_idx = checkpoint['class_to_idx']
     m.load_state_dict(checkpoint['state_dict'])
+    m.learning_rate = checkpoint['learning_rate']
+    m.dropout = checkpoint['dropout']
+    m.epochs = checkpoint['epochs']
 
     return m, c, o

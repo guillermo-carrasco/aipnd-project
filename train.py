@@ -31,6 +31,9 @@ def train(model, criterion, optimizer, data_dir, epochs=15, print_every=40, gpu=
     steps = 0
     model.to(device)
 
+    # Save model hyperparameters
+    model.epochs = epochs
+
     for e in range(epochs):
         running_loss = 0
         for ii, (inputs, labels) in enumerate(dataloaders['train']):
