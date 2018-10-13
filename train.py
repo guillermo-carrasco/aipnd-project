@@ -4,7 +4,7 @@ import logging
 import torch
 
 from helpers import get_device, is_dir, bounded, summarize_params
-from model import build_model, save_model
+from model import build_model, save_model, check_accuracy
 from process import get_datasets_and_loaders
 
 logging.getLogger().setLevel(logging.INFO)
@@ -77,6 +77,10 @@ def train(model, criterion, optimizer, epochs=15, print_every=40, gpu=True, save
     if save:
         save_model(model, image_datasets['train'].class_to_idx, dest=save_dir)
 
+    # Check accuracy after training
+    accuracy = check_accuracy(model, dataloaders['test'])
+    logging.info('Accuracy of the network on the test images: %d %%' % accuracy)
+
     return model
 
 
@@ -119,4 +123,3 @@ if __name__ == '__main__':
                                               dropout=args.dropout,
                                               lr=args.learning_rate)
     train(model, criterion, optimizer)
-

@@ -9,6 +9,8 @@ import torch
 from torch import nn, optim
 from torchvision import models
 
+from helpers import get_device
+
 
 def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
     """
@@ -48,6 +50,27 @@ def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
     optimizer = optim.Adam(model.classifier.parameters(), lr=lr)
 
     return model, criterion, optimizer
+
+
+def check_accuracy(model, test_data):
+    """
+    Checks accuracy of a model
+    """
+    correct = 0
+    total = 0
+    device = get_device()
+    with torch.no_grad():
+        model.eval()
+        model.to(get_device())
+        for data in test_data:
+            images, labels = data
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    return 100*correct / total
 
 
 def save_model(model, class_to_idx, dest='.'):
