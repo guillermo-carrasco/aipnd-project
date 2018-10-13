@@ -10,17 +10,21 @@ from process import get_datasets_and_loaders
 logging.getLogger().setLevel(logging.INFO)
 
 
-def train(epochs=15, print_every=40, save=True):
+def train(model, criterion, optimizer, epochs=15, print_every=40, gpu=True, save=True, save_dir='.'):
     """
     Trains a deep CNN to classify images of flowers
 
+    :param model: Model to train
+    :param criterion: Loss funtion
+    :param optimizer: Loss function optimizer
     :param epochs: Number of epochs to run the training
     :param print_every: Print progress every print_every steps
+    :param gpu: Train on a GPU (if available)
     :param save: Save the trained model on disk or not
+    :param save_dir: Directory where to save the checkpoint file
     :return:
     """
-    device = get_device()
-    model, criterion, optimizer = build_model()
+    device = get_device(gpu)
     image_datasets, dataloaders = get_datasets_and_loaders('flowers')
 
     steps = 0
@@ -71,7 +75,7 @@ def train(epochs=15, print_every=40, save=True):
 
                 running_loss = 0
     if save:
-        save_model(model, image_datasets['train'].class_to_idx)
+        save_model(model, image_datasets['train'].class_to_idx, dest=save_dir)
 
     return model
 
@@ -114,6 +118,5 @@ if __name__ == '__main__':
                                               hidden_units=args.hidden_units,
                                               dropout=args.dropout,
                                               lr=args.learning_rate)
+    train(model, criterion, optimizer)
 
-    #model = train()
-    #model = train()

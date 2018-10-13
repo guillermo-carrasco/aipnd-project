@@ -1,6 +1,7 @@
 """ Operate with PyTorch models
 """
 import logging
+import os
 
 from collections import OrderedDict
 
@@ -49,12 +50,14 @@ def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
     return model, criterion, optimizer
 
 
-def save_model(model, class_to_idx, dest='checkpoint.pth'):
+def save_model(model, class_to_idx, dest='.'):
     """
     Saves a model in disk
     :param model: PyTorch model
     :param class_to_idx: Map of indexes to classes
+    :param dest: where to save the model
     """
+    dest = os.path.join(dest, 'checkpoint.pth')
     model.class_to_idx = class_to_idx
     torch.save({'state_dict': model.state_dict(),
                 'class_to_idx': model.class_to_idx,

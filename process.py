@@ -10,9 +10,9 @@ from torchvision import datasets, transforms
 def get_datasets_and_loaders(data_dir):
     """ Returns a dictionary containing trining, test and validation datasets and data loaders
     """
-    train_dir = os.path.join(data_dir, '/train')
-    valid_dir = os.path.join(data_dir, '/valid')
-    test_dir = os.path.join(data_dir, '/test')
+    train_dir = os.path.join(data_dir, 'train')
+    valid_dir = os.path.join(data_dir, 'valid')
+    test_dir = os.path.join(data_dir, 'test')
 
     data_transforms = {
         'train': transforms.Compose([transforms.RandomRotation(30),

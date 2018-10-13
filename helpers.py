@@ -22,7 +22,8 @@ def bounded(x, min_value, max_value, val_type=float):
     return x
 
 
-def get_device():
+def get_device(gpu=True):
     """ Returns the device to run the model training on
+    :param gpu: If available, train on GPU
     """
-    return torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    return torch.device("cuda:0" if torch.cuda.is_available() and gpu else "cpu")
