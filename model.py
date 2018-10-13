@@ -86,3 +86,17 @@ def save_model(model, class_to_idx, dest='.'):
                 'class_to_idx': model.class_to_idx,
                 'architecture': model.architecture},
                 dest)
+
+
+def load_model(path):
+    """
+    Loads a model from disc
+    :param path: Path to the model
+    :return:
+    """
+    checkpoint = torch.load(path)
+    m, c, o = build_model(checkpoint['architecture'])
+    m.class_to_idx = checkpoint['class_to_idx']
+    m.load_state_dict(checkpoint['state_dict'])
+
+    return m, c, o
