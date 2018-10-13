@@ -10,13 +10,14 @@ from process import get_datasets_and_loaders
 logging.getLogger().setLevel(logging.INFO)
 
 
-def train(model, criterion, optimizer, epochs=15, print_every=40, gpu=True, save=True, save_dir='.'):
+def train(model, criterion, optimizer, data_dir, epochs=15, print_every=40, gpu=True, save=True, save_dir='.'):
     """
     Trains a deep CNN to classify images of flowers
 
     :param model: Model to train
     :param criterion: Loss funtion
     :param optimizer: Loss function optimizer
+    :param data_dir: Data directory for training, test and validation sets
     :param epochs: Number of epochs to run the training
     :param print_every: Print progress every print_every steps
     :param gpu: Train on a GPU (if available)
@@ -25,7 +26,7 @@ def train(model, criterion, optimizer, epochs=15, print_every=40, gpu=True, save
     :return:
     """
     device = get_device(gpu)
-    image_datasets, dataloaders = get_datasets_and_loaders('flowers')
+    image_datasets, dataloaders = get_datasets_and_loaders(data_dir)
 
     steps = 0
     model.to(device)
@@ -122,4 +123,4 @@ if __name__ == '__main__':
                                               hidden_units=args.hidden_units,
                                               dropout=args.dropout,
                                               lr=args.learning_rate)
-    train(model, criterion, optimizer)
+    train(model, criterion, optimizer, args.data_dir)
