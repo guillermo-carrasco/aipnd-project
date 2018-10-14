@@ -103,6 +103,7 @@ def load_model(path):
     m, c, o = build_model(checkpoint['architecture'])
     m.class_to_idx = checkpoint['class_to_idx']
     m.load_state_dict(checkpoint['state_dict'])
+    m.architecture = checkpoint['architecture']
     m.learning_rate = checkpoint['learning_rate']
     m.dropout = checkpoint['dropout']
     m.epochs = checkpoint['epochs']

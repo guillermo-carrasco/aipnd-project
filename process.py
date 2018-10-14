@@ -2,6 +2,7 @@
 """
 import os
 
+import numpy as np
 import torch
 
 from PIL import Image
@@ -50,13 +51,27 @@ def process_image(image):
     '''
     img_pil = Image.open(image)
 
-    process = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    # Resize
+    size = 256
+    width, height = img_pil.size
+    shortest_side = min(width, height)
+    img_pil = img_pil.resize((int((width / shortest_side) * size), int((height / shortest_side) * size)))
 
-    img_tensor = process(img_pil)
+    # Center crop to 224 x 224
+    left = (256 - 224) / 2
+    top = (256 - 224) / 2
+    right = (256 + 224) / 2
+    bottom = (256 + 224) / 2
+    img_pil = img_pil.crop((left, top, right, bottom))
 
-    return img_tensor
+    # Convert image to a numpy array
+    img = (np.array(img_pil)) / 255
+
+    # Normalize the pixel values
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    img = (img - mean) / std
+
+    img = img.transpose((2, 0, 1))
+
+    return img

@@ -15,10 +15,11 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 def predict(image_path, model, topk=1, gpu=True, cat_to_name=None):
-    ''' Predict the class (or classes) of an image using a trained deep learning model.
-    '''
+    """ Predict the class (or classes) of an image using a trained deep learning model.
+    """
     model.to(get_device(gpu))
-    img_torch = process_image(image_path)
+    img = process_image(image_path)
+    img_torch = torch.from_numpy(img)
     img_torch = img_torch.unsqueeze_(0)
     img_torch = img_torch.float()
 
@@ -26,15 +27,16 @@ def predict(image_path, model, topk=1, gpu=True, cat_to_name=None):
         output = model.forward(img_torch.cuda())
 
     probabilities = F.softmax(output.data, dim=1).topk(topk)
+    index_to_class = {val: key for key, val in model.class_to_idx.items()}
 
     probs = np.array(probabilities[0][0])
-    classes = [cat_to_name[str(index + 1)] for index in np.array(probabilities[1][0])] if cat_to_name is not None \
-        else np.array(probabilities[1][0])
+    classes = [cat_to_name[index_to_class[i]] for i in np.array(probabilities[1][0])] if cat_to_name is not None \
+        else [index_to_class[i] for i in np.array(probabilities[1][0])]
 
     # Log the prediction results for the user to see them
     logging.info('\n'.join(['Class: {} with probability {}'.format(c, p) for c, p in zip(classes, probs)]))
 
-    return probabilities
+    return probs, classes
 
 
 if __name__ == '__main__':
@@ -59,4 +61,4 @@ if __name__ == '__main__':
             cat_to_name = json.load(f)
 
     model = load_model(args.checkpoint)
-    prediction = predict(model, args.img_path, topk=args.topk, gpu=args.gpu, cat_to_name=cat_to_name)
+    probs, classes = predict(model, args.img_path, topk=args.topk, gpu=args.gpu, cat_to_name=cat_to_name)
