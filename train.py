@@ -96,7 +96,7 @@ if __name__ == '__main__':
     parser.add_argument('--arch', default='densenet121', choices=['densenet121', 'vgg16', 'densenet161'],
                         help='CNN Architecture to use for feature detection')
     parser.add_argument('--learning-rate', default=0.001, type=float, help='Learning rate to use while training')
-    parser.add_argument('--hidden-units', default=1024, type=int, help='NUmber of hidden units on the first FC layer')
+    parser.add_argument('--hidden-units', default=120, type=int, help='NUmber of hidden units on the first FC layer')
     parser.add_argument('--dropout', default=0.5, type=float, help='Probability of dropout')
     parser.add_argument('--epochs', default=15, type=int, help='Number of epochs to run the training')
     parser.add_argument('--gpu', action='store_true', help='Train the model on a GPU (if available)')

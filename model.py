@@ -12,7 +12,7 @@ from torchvision import models
 from helpers import get_device
 
 
-def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
+def build_model(architecture, hidden_units=120, dropout=0.5, lr=0.001):
     """
     Builds a deep CNN to classify images of flowers
     :param architecture: Architecture to use for the CNN
@@ -23,6 +23,11 @@ def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
     """
     arch = getattr(models, architecture)
     model = arch(pretrained=True)
+
+    if architecture.startswith('dense'):
+        input_size = model.classifier.in_features
+    else:
+        input_size = model.classifier[0].in_features
 
     logging.info('Building model with architecture: {}'.format(architecture))
 
@@ -37,9 +42,9 @@ def build_model(architecture, hidden_units=1024, dropout=0.5, lr=0.001):
 
     classifier = nn.Sequential(OrderedDict([
         ('dropout', nn.Dropout(dropout)),
-        ('fc1', nn.Linear(hidden_units, 120)),
+        ('fc1', nn.Linear(input_size, hidden_units)),
         ('relu1', nn.ReLU()),
-        ('fc2', nn.Linear(120, 90)),
+        ('fc2', nn.Linear(hidden_units, 90)),
         ('relu2', nn.ReLU()),
         ('fc3', nn.Linear(90, 80)),
         ('relu3', nn.ReLU()),
